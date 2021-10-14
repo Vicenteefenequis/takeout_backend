@@ -23,20 +23,19 @@ func (p *PostController) dbConnect() {
 	p.Connection = client
 }
 
-func (p *PostController) postServiceInitializer() *services.PostService{
+func (p *PostController) postServiceInitializer() *services.PostService {
 	coll := p.Connection.Client.Database("takeout_db").Collection("post")
 	postService := services.NewPostService(coll)
 
 	return postService
 }
 
-
-func (p *PostController) GetAll(w http.ResponseWriter,r *http.Request){
+func (p *PostController) GetAll(w http.ResponseWriter, r *http.Request) {
 	p.dbConnect()
 	defer p.Connection.Client.Disconnect(p.Connection.Context)
 
 	postService := p.postServiceInitializer()
-	posts,err := postService.GetAll()
+	posts, err := postService.GetAll()
 
 	if err != nil {
 		sb, _ := json.Marshal(err.Error())
@@ -62,7 +61,7 @@ func (p *PostController) GetById(w http.ResponseWriter, r *http.Request) {
 	w.Write(pb)
 }
 
-func (p *PostController) Create(w http.ResponseWriter,r *http.Request){
+func (p *PostController) Create(w http.ResponseWriter, r *http.Request) {
 	p.dbConnect()
 	defer p.Connection.Client.Disconnect(p.Connection.Context)
 	postService := p.postServiceInitializer()
@@ -73,9 +72,7 @@ func (p *PostController) Create(w http.ResponseWriter,r *http.Request){
 
 	err = json.Unmarshal(body, &post)
 
-
 	postResponse, _ := postService.Create(post)
-
 
 	if err != nil {
 		sb, _ := json.Marshal(err.Error())
@@ -84,4 +81,19 @@ func (p *PostController) Create(w http.ResponseWriter,r *http.Request){
 
 	pb, _ := json.Marshal(postResponse)
 	w.Write(pb)
+}
+
+func (p *PostController) Delete(w http.ResponseWriter, r *http.Request) {
+	p.dbConnect()
+	defer p.Connection.Client.Disconnect(p.Connection.Context)
+	postService := p.postServiceInitializer()
+
+	params := mux.Vars(r)
+	err := postService.Delete(params["id"])
+
+	if err != nil {
+		sb, _ := json.Marshal(err.Error())
+		w.Write(sb)
+	}
+
 }
