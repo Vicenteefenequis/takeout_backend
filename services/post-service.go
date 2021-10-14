@@ -79,3 +79,17 @@ func (p *PostService) Create(post domain.Post) (*domain.Post, error) {
 
 	return &post, nil
 }
+
+func (p *PostService) Delete(id string) error {
+
+	objectId, err := primitive.ObjectIDFromHex(id)
+
+	_,err = p.Collection.DeleteOne(context.Background(),bson.D{{"_id", objectId}})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
