@@ -14,6 +14,7 @@ func NewRootController() *mux.Router  {
 	router.HandleFunc("/",postController.GetAll).Methods("GET")
 	router.HandleFunc("/{id}", postController.GetById).Methods("GET")
 	router.HandleFunc("/",postController.Create).Methods("POST")
+	router.HandleFunc("/{id}",postController.Delete).Methods("DELETE")
 
 	return router
 }
