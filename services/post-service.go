@@ -97,17 +97,21 @@ func (p *PostService) Delete(id string) error {
 func (p *PostService) Update(post *domain.Post, id string) (*domain.Post, error) {
 	objectId, err := primitive.ObjectIDFromHex(id)
 
+	postResult := new(domain.Post)
+
 	updatedPost := bson.D{}
 
 	mapper(*post, &updatedPost)
 
 	update := bson.D{{"$set", updatedPost}}
 
-	p.Collection.FindOneAndUpdate(context.Background(), bson.D{{"_id", objectId}}, update)
+	sr := p.Collection.FindOneAndUpdate(context.Background(), bson.D{{"_id", objectId}}, update)
+
+	err = sr.Decode(postResult)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return post, nil
+	return postResult, nil
 }
