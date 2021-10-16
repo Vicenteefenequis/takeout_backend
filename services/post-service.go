@@ -44,7 +44,7 @@ func (p *PostService) GetAll() ([]*domain.Post, error) {
 		posts = append(posts, post)
 	}
 
-	return posts,nil
+	return posts, nil
 }
 
 func (p *PostService) Get(id string) (*domain.Post, error) {
@@ -67,7 +67,8 @@ func (p *PostService) Create(post domain.Post) (*domain.Post, error) {
 		{"name_user", post.NameUser},
 		{"type_post", post.TypePost},
 		{"visibility", post.Visibility},
-		{"case_status", post.CaseStatus}, {"image", post.Image},
+		{"case_status", post.CaseStatus},
+		{"image", post.Image},
 		{"description", post.Description},
 	}
 
@@ -81,10 +82,9 @@ func (p *PostService) Create(post domain.Post) (*domain.Post, error) {
 }
 
 func (p *PostService) Delete(id string) error {
-
 	objectId, err := primitive.ObjectIDFromHex(id)
 
-	_,err = p.Collection.DeleteOne(context.Background(),bson.D{{"_id", objectId}})
+	_, err = p.Collection.DeleteOne(context.Background(), bson.D{{"_id", objectId}})
 
 	if err != nil {
 		return err
@@ -92,4 +92,22 @@ func (p *PostService) Delete(id string) error {
 
 	return nil
 
+}
+
+func (p *PostService) Update(post *domain.Post, id string) (*domain.Post, error) {
+	objectId, err := primitive.ObjectIDFromHex(id)
+
+	updatedPost := bson.D{}
+
+	mapper(*post, &updatedPost)
+
+	update := bson.D{{"$set", updatedPost}}
+
+	p.Collection.FindOneAndUpdate(context.Background(), bson.D{{"_id", objectId}}, update)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return post, nil
 }
