@@ -97,3 +97,27 @@ func (p *PostController) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
+func (p *PostController) Update(w http.ResponseWriter, r *http.Request) {
+	p.dbConnect()
+	defer p.Connection.Client.Disconnect(p.Connection.Context)
+	postService := p.postServiceInitializer()
+
+	body, err := ioutil.ReadAll(r.Body)
+
+	var post domain.Post
+
+	err = json.Unmarshal(body, &post)
+
+	params := mux.Vars(r)
+	postResult, err := postService.Update(&post, params["id"])
+
+	if err != nil {
+		sb, _ := json.Marshal(err.Error())
+		w.Write(sb)
+	}
+
+	pb, _ := json.Marshal(postResult)
+	w.Write(pb)
+
+}
