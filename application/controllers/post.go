@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"takeout-backend/application/database"
+	"takeout-backend/application/validator"
 	"takeout-backend/domain"
 	"takeout-backend/services"
 )
@@ -67,16 +68,21 @@ func (p *PostController) Create(w http.ResponseWriter, r *http.Request) {
 	postService := p.postServiceInitializer()
 
 	body, err := ioutil.ReadAll(r.Body)
-
 	var post domain.Post
-
 	err = json.Unmarshal(body, &post)
+
+	v := validator.Validator{}
+
+	err = v.Validate(post)
 
 	postResponse, _ := postService.Create(post)
 
 	if err != nil {
-		sb, _ := json.Marshal(err.Error())
-		w.Write(sb)
+		resp := make(map[string]string)
+		resp["error"] = err.Error()
+		jsonResp, _ := json.Marshal(resp)
+		http.Error(w, string(jsonResp), http.StatusBadRequest)
+		return
 	}
 
 	pb, _ := json.Marshal(postResponse)
