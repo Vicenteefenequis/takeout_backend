@@ -64,12 +64,12 @@ Campos Requiridos e Validação para Criar
 
 ```
 {
-  "error": "{field} e Requirido"
+  "error": "{field} e Requerido"
 }
 
 ou
 
 {
-  "error": {field} tem que ser menor que {maxlength}
+  "error": {field} tem que ser no maximo {maxlength} caracteres
 }
 ```
